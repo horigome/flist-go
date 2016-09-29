@@ -11,6 +11,12 @@ This is, to get the file list, is a small tool to be output to the CSV.
     > cd flist-go
     > make
 
+or
+
+    > cd flist-go
+    > go run main.go
+
+
 ## How to usage
 
     > cd _build
@@ -18,16 +24,23 @@ This is, to get the file list, is a small tool to be output to the CSV.
 
 #### -no:
 
-No output CSV filename
+No output CSV file 
 
 #### -m "pattern"
 
-Match filename (regurar expression)  
+Match filename pattern (regurar expression)  
+
+#### -md "pattern"
+
+Match directory name pattern (regurar expression)  
 
 #### -s "pattern"
 
 Skip filename pattern (regurar expression)  
 
+#### -sd "pattern"
+
+Skip directory name pattern (regurar expression)  
 
 #### -f "csv filename"
 

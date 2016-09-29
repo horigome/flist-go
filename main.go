@@ -16,10 +16,12 @@ import (
 
 // Params command line option values
 type Params struct {
-	matchString string // match filename (regular expression)
-	skipString  string // match filename (regular expression)
-	noCSV       bool   // false: no Output CSV
-	specCSVFile string // csv filename specification
+	matchString    string // match filename (regular expression)
+	skipString     string // match filename (regular expression)
+	matchDirString string // match filename (regular expression)
+	skipDirString  string // match filename (regular expression)
+	noCSV          bool   // false: no Output CSV
+	specCSVFile    string // csv filename specification
 }
 
 // CommandUsage commandline usage
@@ -40,6 +42,8 @@ func newParams() *Params {
 	var p Params
 	flag.StringVar(&p.matchString, "m", "", " File Match String(Regular expression)")
 	flag.StringVar(&p.skipString, "s", "", " File Skip String(Regular expression)")
+	flag.StringVar(&p.matchDirString, "md", "", " Directory Match String(Regular expression)")
+	flag.StringVar(&p.skipDirString, "sd", "", " Directory Skip String(Regular expression)")
 	flag.StringVar(&p.specCSVFile, "f", "", " Specify CSV filename")
 	flag.BoolVar(&p.noCSV, "no", false, " CSV Not Output")
 
@@ -52,7 +56,7 @@ func newParams() *Params {
 	return &p
 }
 
-func isFileMatch(matchString string, s string) bool {
+func isMatch(matchString string, s string) bool {
 	r := regexp.MustCompile(matchString)
 	return r.MatchString(s)
 }
@@ -131,27 +135,40 @@ func main() {
 	}
 
 	// * Parse dir
-	root, _ := filepath.Abs(filepath.Dir("."))
-	fmt.Println("\n(root)---> ", root)
 	num := 0
+	root, _ := filepath.Abs(filepath.Dir("."))
+	fmt.Println("\n", time.Now())
+	fmt.Println("(root)---> ", root)
 
 	filepath.Walk(root,
 		func(path string, info os.FileInfo, err error) error {
 			if info.IsDir() {
 				return nil // skip directory
 			}
-			if p.matchString != "" && !isFileMatch(p.matchString, info.Name()) {
+			rel, _ := filepath.Rel(root, path)
+
+			// match dir name
+			if p.matchDirString != "" && !isMatch(p.matchDirString, filepath.Dir(rel)) {
 				return nil
 			}
-			if p.skipString != "" && isFileMatch(p.skipString, info.Name()) {
+			// skip dir
+			if p.skipDirString != "" && isMatch(p.skipDirString, filepath.Dir(rel)) {
+				return nil
+			}
+
+			// match filename
+			if p.matchString != "" && !isMatch(p.matchString, info.Name()) {
+				return nil
+			}
+			// skip filename
+			if p.skipString != "" && isMatch(p.skipString, info.Name()) {
 				return nil // skip pattern
 			}
 
-			rel, _ := filepath.Rel(root, path)
 			fmt.Println(rel)
+			writeCSV(writer, root, rel, info, false)
 			num++
 
-			writeCSV(writer, root, rel, info, false)
 			return nil
 		})
 
