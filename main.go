@@ -70,7 +70,7 @@ func writeCSV(writer *csv.Writer, basepath, path string, info os.FileInfo, head 
 	if head {
 		// Write to CSV Header
 		writer.Write([]string{
-			"basepath", "path", "filename", "mod-date", "mod-time",
+			"basepath", "path", "filename", "mod-date", "mod-time", "size",
 		})
 	} else {
 		// Write to CSV Record
@@ -82,6 +82,7 @@ func writeCSV(writer *csv.Writer, basepath, path string, info os.FileInfo, head 
 				info.ModTime().Year(), info.ModTime().Month(), info.ModTime().Day()),
 			fmt.Sprintf("%02d:%02d:%d",
 				info.ModTime().Hour(), info.ModTime().Minute(), info.ModTime().Second()),
+			fmt.Sprintf("%v", info.Size()),
 		})
 	}
 	writer.Flush()
@@ -136,9 +137,8 @@ func main() {
 
 	// * Parse dir
 	num := 0
+	sumSize := int64(0)
 	root, _ := filepath.Abs(filepath.Dir("."))
-	fmt.Println("\n", time.Now())
-	fmt.Println("(root)---> ", root)
 
 	filepath.Walk(root,
 		func(path string, info os.FileInfo, err error) error {
@@ -168,9 +168,14 @@ func main() {
 			fmt.Println(rel)
 			writeCSV(writer, root, rel, info, false)
 			num++
+			sumSize = sumSize + info.Size()
 
 			return nil
 		})
 
-	fmt.Printf("--------->  %v files\n", num)
+	fmt.Println("---------------------------------------------------------")
+	fmt.Println("Exec Date  : ", time.Now())
+	fmt.Println("Root       : ", root)
+	fmt.Println("NumFiles   : ", num)
+	fmt.Println("Total Size : ", sumSize)
 }
