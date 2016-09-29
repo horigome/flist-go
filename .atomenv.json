@@ -1,0 +1,5 @@
+{
+    "env": {
+        "GOPATH": "$ATOM_PROJECT_PATH/_vendor"
+    }
+}
