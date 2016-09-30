@@ -14,6 +14,8 @@ import (
 	"time"
 )
 
+var version = "0.0.0.0"
+
 // Params command line option values
 type Params struct {
 	matchString    string // match filename (regular expression)
@@ -21,15 +23,12 @@ type Params struct {
 	matchDirString string // match filename (regular expression)
 	skipDirString  string // match filename (regular expression)
 	noCSV          bool   // false: no Output CSV
+	noDetail       bool   // false: no detail
 	specCSVFile    string // csv filename specification
 }
 
 // CommandUsage commandline usage
 var CommandUsage = `
-flist go
-  ver 0.1.0.0
-  copyright M.Horigome
-
 Usage : flist <options>
 
 options:
@@ -39,6 +38,8 @@ options:
 // newParams get commandline params
 func newParams() *Params {
 
+	var v bool
+
 	var p Params
 	flag.StringVar(&p.matchString, "m", "", " File Match String(Regular expression)")
 	flag.StringVar(&p.skipString, "s", "", " File Skip String(Regular expression)")
@@ -46,6 +47,8 @@ func newParams() *Params {
 	flag.StringVar(&p.skipDirString, "sd", "", " Directory Skip String(Regular expression)")
 	flag.StringVar(&p.specCSVFile, "f", "", " Specify CSV filename")
 	flag.BoolVar(&p.noCSV, "no", false, " CSV Not Output")
+	flag.BoolVar(&p.noDetail, "nd", false, " Print list only")
+	flag.BoolVar(&v, "version", false, " Show version")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, CommandUsage)
@@ -53,6 +56,10 @@ func newParams() *Params {
 	}
 	flag.Parse()
 
+	if v {
+		fmt.Println("flist-go version ", version)
+		os.Exit(0)
+	}
 	return &p
 }
 
@@ -173,9 +180,12 @@ func main() {
 			return nil
 		})
 
-	fmt.Println("---------------------------------------------------------")
-	fmt.Println("Exec Date  : ", time.Now())
-	fmt.Println("Root       : ", root)
-	fmt.Println("NumFiles   : ", num)
-	fmt.Println("Total Size : ", sumSize)
+	if !p.noDetail {
+		fmt.Println("\n---------------------------------------------------------")
+		fmt.Println("Exec Date  : ", time.Now())
+		fmt.Println("Root       : ", root)
+		fmt.Println("NumFiles   : ", num)
+		fmt.Println("Total Size : ", sumSize)
+		fmt.Println("")
+	}
 }

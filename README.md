@@ -24,7 +24,11 @@ or
 
 #### -no:
 
-No output CSV file 
+No output CSV file
+
+#### -nd:
+
+No display datail
 
 #### -m "pattern"
 
@@ -45,6 +49,10 @@ Skip directory name pattern (regurar expression)
 #### -f "csv filename"
 
 Specify csv file name
+
+#### -version
+
+Show version no.
 
 ## License
 
