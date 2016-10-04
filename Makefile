@@ -19,7 +19,8 @@ endif
 
 # Packages Lists
 # ビルドターゲットが利用するVendorパッケージを指定します
-VENDERS= github.com/djimenez/iconv-go
+VENDERS= golang.org/x/text/encoding/japanese \
+		 golang.org/x/text/transform
 
 ################################################################
 GOPATH=$(CURDIR)/_vendor

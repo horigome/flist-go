@@ -12,6 +12,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"time"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 var version = "0.0.0.0"
@@ -118,7 +121,8 @@ func openCSV(filename string) (*os.File, *csv.Writer, error) {
 		return nil, nil, err
 	}
 	err = file.Truncate(0)
-	writer := csv.NewWriter(file)
+	//writer := csv.NewWriter(file)
+	writer := csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
 
 	return file, writer, nil
 }
