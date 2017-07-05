@@ -12,6 +12,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"time"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
 )
 
 var version = "0.0.0.0"
@@ -25,6 +28,7 @@ type Params struct {
 	noCSV          bool   // false: no Output CSV
 	noDetail       bool   // false: no detail
 	specCSVFile    string // csv filename specification
+	toSJIS         bool   // true: SJIS false:UTF8(def)
 }
 
 // CommandUsage commandline usage
@@ -48,6 +52,7 @@ func newParams() *Params {
 	flag.StringVar(&p.specCSVFile, "f", "", " Specify CSV filename")
 	flag.BoolVar(&p.noCSV, "no", false, " CSV Not Output")
 	flag.BoolVar(&p.noDetail, "nd", false, " Print list only")
+	flag.BoolVar(&p.toSJIS, "sjis", false, " SJIS encoding")
 	flag.BoolVar(&v, "version", false, " Show version")
 
 	flag.Usage = func() {
@@ -96,7 +101,7 @@ func writeCSV(writer *csv.Writer, basepath, path string, info os.FileInfo, head 
 }
 
 // openCSV Open CSV File
-func openCSV(filename string) (*os.File, *csv.Writer, error) {
+func openCSV(filename string, toSJIS bool) (*os.File, *csv.Writer, error) {
 
 	csvfile := filename
 	if csvfile == "" {
@@ -117,9 +122,14 @@ func openCSV(filename string) (*os.File, *csv.Writer, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	err = file.Truncate(0)
-	writer := csv.NewWriter(file)
+	file.Truncate(0)
 
+	if toSJIS == true {
+		writer := csv.NewWriter(transform.NewWriter(file, japanese.ShiftJIS.NewEncoder()))
+		return file, writer, nil
+	}
+
+	writer := csv.NewWriter(file)
 	return file, writer, nil
 }
 
@@ -135,7 +145,7 @@ func main() {
 	var err error
 
 	if !p.noCSV {
-		file, writer, err = openCSV(p.specCSVFile)
+		file, writer, err = openCSV(p.specCSVFile, p.toSJIS)
 		if err == nil {
 			defer file.Close()
 			writeCSV(writer, "", "", nil, true)
@@ -163,7 +173,7 @@ func main() {
 				return nil
 			}
 
-			// match filename
+			// match lename
 			if p.matchString != "" && !isMatch(p.matchString, info.Name()) {
 				return nil
 			}

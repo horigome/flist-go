@@ -1,6 +1,6 @@
 # flist go
 
-2016-09-29 M.Horigome
+2017-07-05 M.Horigome
 
 ## Overview
 This is, to get the file list, is a small tool to be output to the CSV.
@@ -49,6 +49,10 @@ Skip directory name pattern (regurar expression)
 #### -f "csv filename"
 
 Specify csv file name
+
+#### -sjij
+
+use SJIS encoding
 
 #### -version
 

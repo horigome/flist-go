@@ -6,7 +6,7 @@
 # Windowsでは、MSYS2とGNU Makeが別途必要です
 ################################################################
 
-VERSION=1.0.0.0
+VERSION=1.0.0.1
 TARGET=flist
 
 ifeq ($(OS),Windows_NT)
@@ -19,7 +19,8 @@ endif
 
 # Packages Lists
 # ビルドターゲットが利用するVendorパッケージを指定します
-VENDERS= github.com/djimenez/iconv-go
+VENDERS= golang.org/x/text/encoding/japanese \
+		 golang.org/x/text/transform
 
 ################################################################
 GOPATH=$(CURDIR)/_vendor
