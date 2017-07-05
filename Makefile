@@ -6,7 +6,7 @@
 # Windowsでは、MSYS2とGNU Makeが別途必要です
 ################################################################
 
-VERSION=1.0.0.0
+VERSION=1.0.0.1
 TARGET=flist
 
 ifeq ($(OS),Windows_NT)
